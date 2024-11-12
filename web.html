@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Suhu dan Kelembaban</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: #ff6363;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    p {
+      font-size: 1.1em;
+      color: #555;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Styling tabel */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      padding: 15px;
+      text-align: center;
+      color: #333;
+      position: relative;
+    }
+    th {
+      background-color: #ff6363;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+    td {
+      background: linear-gradient(135deg, #ffe3e3, #ffffff);
+      font-weight: 500;
+    }
+
+    /* Row hover effect */
+    tr:hover td {
+      background: #ffdfdf;
+      color: #ff6363;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Add subtle separator lines */
+    td:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 60%;
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Informasi Suhu dan Kelembaban Maksimum</h2>
+    <p>Suhu Maksimum: <span id="suhu-max">--</span> °C</p>
+    <p>Suhu Minimum: <span id="suhu-min">--</span> °C</p>
+    <p>Suhu Rata-rata: <span id="suhu-rata">--</span> °C</p>
+
+    <h3>Data Suhu Maksimum dengan Kelembaban Tertinggi</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Suhu (°C)</th>
+          <th>Kelembaban (%)</th>
+          <th>Lux</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="data-suhu-humid">
+        <tr><td colspan="5">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Mengambil data dari API
+    fetch('http://localhost/157_TriSartika_UTS/get.php')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("suhu-max").textContent = data.suhumax;
+        document.getElementById("suhu-min").textContent = data.suhumin;
+        document.getElementById("suhu-rata").textContent = data.suhurata;
+
+        // Menghapus placeholder di tabel
+        document.getElementById("data-suhu-humid").innerHTML = "";
+
+        // Menampilkan data suhu maksimum dengan kelembaban tertinggi dalam tabel
+        const tableBody = document.getElementById("data-suhu-humid");
+        data.nilai_suhu_max_humid_max.forEach(item => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.id}</td>
+            <td>${item.suhu}</td>
+            <td>${item.humid}</td>
+            <td>${item.lux}</td>
+            <td>${item.ts}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => {
+        console.error('Gagal mengambil data:', error);
+      });
+  </script>
+
+</body>
+</html>
